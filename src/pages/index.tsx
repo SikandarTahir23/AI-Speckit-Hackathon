@@ -149,7 +149,7 @@ export default function Home(): ReactNode {
               <div className="col col--4">
                 <div className="card margin-bottom--lg">
                   <div className="card__header">
-                    <div style={{fontSize: '3rem', marginBottom: '0.5rem'}}>🎓</div>
+                    <div style={{fontSize: '3rem', marginBottom: '0.5rem'}}>🛠️</div>
                     <h3>Chapter 6</h3>
                   </div>
                   <div className="card__body">
@@ -166,7 +166,7 @@ export default function Home(): ReactNode {
               <div className="col col--4">
                 <div className="card margin-bottom--lg">
                   <div className="card__header">
-                    <div style={{fontSize: '3rem', marginBottom: '0.5rem'}}>🎓</div>
+                    <div style={{fontSize: '3rem', marginBottom: '0.5rem'}}>🦾</div>
                     <h3>Chapter 7</h3>
                   </div>
                   <div className="card__body">
@@ -183,7 +183,7 @@ export default function Home(): ReactNode {
               <div className="col col--4">
                 <div className="card margin-bottom--lg">
                   <div className="card__header">
-                    <div style={{fontSize: '3rem', marginBottom: '0.5rem'}}>🎓</div>
+                    <div style={{fontSize: '3rem', marginBottom: '0.5rem'}}>💡</div>
                     <h3>Chapter 8</h3>
                   </div>
                   <div className="card__body">
