@@ -596,9 +596,213 @@ async def personalize_chapter(
         )
 
 
-# Future endpoints (Phase 5 - User Story 3):
-# - POST /translate (Urdu translation)
-#
+# ====================
+# Phase 5: User Story 3 - Urdu Translation (P3)
+# ====================
+
+from models.translation import Translation
+from agents.translation_agent import get_translation_agent
+
+
+class TranslationRequest(BaseModel):
+    """
+    Request schema for POST /translate.
+
+    User requests translation of chapter content to Urdu.
+    """
+    chapter_id: int = Field(
+        ge=1,
+        le=8,
+        description="Chapter ID (1-8 for the 8 book chapters)"
+    )
+    target_lang: str = Field(
+        default="ur",
+        description="Target language code (default: 'ur' for Urdu)"
+    )
+
+
+class TranslationResponse(BaseModel):
+    """
+    Response schema for POST /translate.
+
+    Returns both original and translated content with metadata.
+    """
+    chapter_id: int
+    language_code: str
+    original_text: str
+    translated_text: str
+    cached: bool = Field(description="True if translation was retrieved from cache")
+    processing_time_ms: int = Field(description="Time taken to process request in milliseconds")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "chapter_id": 3,
+                "language_code": "ur",
+                "original_text": "# Chapter 3: Actuation Systems\n\nActuation systems are...",
+                "translated_text": "# باب 3: Actuation Systems\n\nActuation systems یہ ہیں...",
+                "cached": True,
+                "processing_time_ms": 1250
+            }
+        }
+
+
+@router.post("/translate", response_model=TranslationResponse, tags=["Translation"])
+@limiter.limit("10/minute")  # Rate limiting: prevent abuse
+async def translate_chapter(
+    request: TranslationRequest,
+    req: Request,  # Required for rate limiter
+    session: Session = Depends(get_session)
+):
+    """
+    Translate chapter content to Urdu.
+
+    Implements Hackathon Bonus Feature 3 (25 points):
+    - Translates chapter content from English to Urdu
+    - Preserves technical terms in English for clarity
+    - Caches translations for fast subsequent requests (<2s)
+    - Returns both original and translated text for side-by-side display
+
+    Requirements:
+    - chapter_id must be valid (1-8)
+    - No authentication required (accessible to all users)
+
+    Performance:
+    - Cache hit: <2s (SC-004)
+    - Cache miss: <15s (includes OpenAI API call) (SC-005)
+
+    Returns:
+        TranslationResponse with original and translated content
+
+    Raises:
+        404: If chapter not found
+        500: If translation fails (English content still accessible)
+    """
+    start_time = time_module.time()
+
+    try:
+        # Step 1: Check cache first (Translation table)
+        logger.info(f"Translation request: chapter_id={request.chapter_id}, lang={request.target_lang}")
+
+        cached_translation = session.exec(
+            select(Translation).where(
+                Translation.chapter_id == request.chapter_id,
+                Translation.language_code == request.target_lang
+            )
+        ).first()
+
+        # Get chapter content (needed for both cache hit and miss)
+        chapter = session.exec(
+            select(Chapter).where(Chapter.chapter_number == request.chapter_id)
+        ).first()
+
+        if not chapter:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Chapter {request.chapter_id} not found"
+            )
+
+        # Get all paragraphs for this chapter
+        paragraphs = session.exec(
+            select(Paragraph)
+            .where(Paragraph.chapter_id == chapter.id)
+            .order_by(Paragraph.paragraph_index)
+        ).all()
+
+        if not paragraphs:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No content found for chapter {request.chapter_id}"
+            )
+
+        # Assemble full chapter content
+        original_content = f"# Chapter {request.chapter_id}: {chapter.title}\n\n"
+        original_content += "\n\n".join([p.content for p in paragraphs])
+
+        if cached_translation:
+            # Cache hit - return immediately
+            processing_time_ms = int((time_module.time() - start_time) * 1000)
+            logger.info(f"Cache HIT for chapter {request.chapter_id} ({request.target_lang}) - {processing_time_ms}ms")
+
+            return TranslationResponse(
+                chapter_id=request.chapter_id,
+                language_code=request.target_lang,
+                original_text=original_content,
+                translated_text=cached_translation.translated_text,
+                cached=True,
+                processing_time_ms=processing_time_ms
+            )
+
+        # Step 2: Cache miss - translate content
+        logger.info(f"Cache MISS for chapter {request.chapter_id} ({request.target_lang}) - translating content")
+
+        try:
+            translation_agent = get_translation_agent()
+            translated_text = await translation_agent.translate_to_urdu(
+                content=original_content
+            )
+
+            if not translated_text:
+                # Translation failed - return original content with error flag
+                logger.warning(f"Translation returned None for chapter {request.chapter_id} - English content still accessible")
+                processing_time_ms = int((time_module.time() - start_time) * 1000)
+
+                return TranslationResponse(
+                    chapter_id=request.chapter_id,
+                    language_code=request.target_lang,
+                    original_text=original_content,
+                    translated_text=original_content,  # Fallback to original
+                    cached=False,
+                    processing_time_ms=processing_time_ms
+                )
+
+            # Step 3: Store in cache
+            new_translation = Translation(
+                chapter_id=request.chapter_id,
+                language_code=request.target_lang,
+                original_text=original_content,
+                translated_text=translated_text
+            )
+            session.add(new_translation)
+            session.commit()
+            logger.info(f"Cached translation for chapter {request.chapter_id} ({request.target_lang})")
+
+            processing_time_ms = int((time_module.time() - start_time) * 1000)
+            logger.info(f"Translation complete for chapter {request.chapter_id} - {processing_time_ms}ms")
+
+            return TranslationResponse(
+                chapter_id=request.chapter_id,
+                language_code=request.target_lang,
+                original_text=original_content,
+                translated_text=translated_text,
+                cached=False,
+                processing_time_ms=processing_time_ms
+            )
+
+        except Exception as e:
+            # Error during translation - return original content (FR-026)
+            logger.error(f"Translation failed for chapter {request.chapter_id}: {e}", exc_info=True)
+            processing_time_ms = int((time_module.time() - start_time) * 1000)
+
+            return TranslationResponse(
+                chapter_id=request.chapter_id,
+                language_code=request.target_lang,
+                original_text=original_content,
+                translated_text=original_content,  # Fallback to original
+                cached=False,
+                processing_time_ms=processing_time_ms
+            )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error in translation endpoint: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Translation service error: {str(e)}"
+        )
+
+
 # Future endpoints (Phase 4 - User Story 2):
 # - GET /history/{session_id}
 #

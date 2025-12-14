@@ -1,0 +1,330 @@
+/**
+ * TranslatedChapter Styles (Hackathon Bonus Feature 3)
+ * T089: Side-by-side layout styling
+ */
+
+.container {
+  margin: 2rem 0;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Call-to-action (before translation) */
+.callToAction {
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #ebf8ff 0%, #f7fafc 100%);
+  text-align: center;
+}
+
+.ctaContent h3 {
+  margin: 0 0 0.8rem 0;
+  font-size: 1.6rem;
+  color: #2c5282;
+}
+
+.ctaContent p {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.05rem;
+  color: #4a5568;
+}
+
+.translateButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 2rem;
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+}
+
+.translateButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.4);
+}
+
+.translateButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  border-bottom: 2px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  background: #4299e1;
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 6px rgba(66, 153, 225, 0.3);
+}
+
+.badgeIcon {
+  font-size: 1.2rem;
+}
+
+/* Display mode controls */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.label {
+  font-weight: 600;
+  color: #4a5568;
+  font-size: 0.9rem;
+}
+
+.toggleGroup {
+  display: flex;
+  gap: 0.3rem;
+  background: white;
+  padding: 0.3rem;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.toggleButton {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #4a5568;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggleButton:hover {
+  background: #f7fafc;
+}
+
+.toggleButton.active {
+  background: #4299e1;
+  color: white;
+  box-shadow: 0 2px 4px rgba(66, 153, 225, 0.3);
+}
+
+/* Content area */
+.content {
+  display: flex;
+  background: white;
+  min-height: 400px;
+}
+
+.column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.column.dual {
+  flex: 1;
+}
+
+.column.single {
+  flex: 1;
+  max-width: 100%;
+}
+
+.columnHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: #f7fafc;
+  border-bottom: 2px solid #e2e8f0;
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 0.95rem;
+}
+
+.flag {
+  font-size: 1.3rem;
+}
+
+.columnContent {
+  flex: 1;
+  padding: 2rem 2.5rem;
+  overflow-y: auto;
+  line-height: 1.8;
+  font-size: 1.05rem;
+  color: #2d3748;
+}
+
+/* Urdu specific styling */
+.columnContent.urdu {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+  font-size: 1.15rem;
+  line-height: 2;
+}
+
+.divider {
+  width: 2px;
+  background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e0 50%, #e2e8f0 100%);
+}
+
+/* Markdown content styling */
+.columnContent h1 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  color: #1a202c;
+  border-bottom: 3px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+}
+
+.columnContent h2 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  color: #2d3748;
+}
+
+.columnContent h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
+  font-size: 1.3rem;
+  color: #4a5568;
+}
+
+.columnContent p {
+  margin-bottom: 1.2rem;
+}
+
+.columnContent code {
+  background: #f7fafc;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+  color: #c53030;
+}
+
+/* Footer */
+.footer {
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #ebf8ff 0%, #f7fafc 100%);
+  border-top: 2px solid #e2e8f0;
+}
+
+.footerText {
+  margin: 0;
+  color: #4a5568;
+  font-size: 0.9rem;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Error message */
+.errorMessage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding: 0.8rem 1.2rem;
+  background: #fff5f5;
+  border: 1px solid #fc8181;
+  border-radius: 8px;
+  color: #c53030;
+  font-size: 0.95rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Responsive design */
+@media (max-width: 968px) {
+  .content {
+    flex-direction: column;
+  }
+
+  .column.dual {
+    flex: none;
+    width: 100%;
+  }
+
+  .divider {
+    width: 100%;
+    height: 2px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .controls {
+    justify-content: center;
+  }
+
+  .columnContent {
+    padding: 1.5rem 1.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .toggleGroup {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .toggleButton {
+    width: 100%;
+    text-align: center;
+  }
+
+  .callToAction {
+    padding: 2rem 1.5rem;
+  }
+
+  .ctaContent h3 {
+    font-size: 1.3rem;
+  }
+
+  .ctaContent p {
+    font-size: 0.95rem;
+  }
+}
