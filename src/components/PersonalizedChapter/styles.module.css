@@ -1,0 +1,193 @@
+/**
+ * PersonalizedChapter Styles (Hackathon Bonus Feature 2)
+ * T062: Component styling
+ */
+
+.container {
+  margin: 2rem 0;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  border-bottom: 2px solid #e2e8f0;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.badgeIcon {
+  font-size: 1.2rem;
+}
+
+.badgeText {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.changeButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: white;
+  border: 2px solid #cbd5e0;
+  border-radius: 8px;
+  color: #4a5568;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.changeButton:hover {
+  background: #ebf8ff;
+  border-color: #4299e1;
+  color: #2c5282;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(66, 153, 225, 0.2);
+}
+
+.content {
+  padding: 2rem 2.5rem;
+  background: white;
+  line-height: 1.8;
+  font-size: 1.05rem;
+  color: #2d3748;
+}
+
+.content h1 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  color: #1a202c;
+  border-bottom: 3px solid #e2e8f0;
+  padding-bottom: 0.5rem;
+}
+
+.content h2 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  color: #2d3748;
+}
+
+.content h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
+  font-size: 1.3rem;
+  color: #4a5568;
+}
+
+.content p {
+  margin-bottom: 1.2rem;
+}
+
+.content ul,
+.content ol {
+  margin-bottom: 1.2rem;
+  padding-left: 1.8rem;
+}
+
+.content li {
+  margin-bottom: 0.5rem;
+}
+
+.content code {
+  background: #f7fafc;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+  color: #c53030;
+}
+
+.content pre {
+  background: #2d3748;
+  color: #e2e8f0;
+  padding: 1.2rem;
+  border-radius: 8px;
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+
+.content pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.content blockquote {
+  border-left: 4px solid #4299e1;
+  padding-left: 1rem;
+  margin: 1.5rem 0;
+  color: #4a5568;
+  font-style: italic;
+  background: #f7fafc;
+  padding: 1rem 1rem 1rem 1.5rem;
+  border-radius: 4px;
+}
+
+.footer {
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #ebf8ff 0%, #f7fafc 100%);
+  border-top: 2px solid #e2e8f0;
+}
+
+.footerText {
+  margin: 0;
+  color: #4a5568;
+  font-size: 0.9rem;
+  text-align: center;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .badge {
+    justify-content: center;
+  }
+
+  .changeButton {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .content {
+    padding: 1.5rem 1.2rem;
+    font-size: 1rem;
+  }
+
+  .content h1 {
+    font-size: 1.6rem;
+  }
+
+  .content h2 {
+    font-size: 1.3rem;
+  }
+
+  .content h3 {
+    font-size: 1.1rem;
+  }
+}
