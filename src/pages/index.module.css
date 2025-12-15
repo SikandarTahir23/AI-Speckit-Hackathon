@@ -1,23 +1,31 @@
-/**
- * CSS files with the .module.css suffix will be treated as CSS modules
- * and scoped locally.
- */
-
-.heroBanner {
-  padding: 4rem 0;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
+.homePage {
+  /* This will be the main container for our new homepage design */
 }
 
-@media screen and (max-width: 996px) {
-  .heroBanner {
-    padding: 2rem;
-  }
-}
-
-.buttons {
+.chatbotTrigger {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--ifm-color-primary);
+  border: none;
+  box-shadow: 0 8px 24px -4px rgba(0, 212, 255, 0.4);
+  cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 999;
+}
+
+.chatbotTrigger:hover {
+  transform: scale(1.1);
+  box-shadow: 0 12px 32px -4px rgba(0, 212, 255, 0.5);
+}
+
+.chatbotIcon {
+  font-size: 1.75rem;
+  line-height: 1;
 }

@@ -1,0 +1,338 @@
+/**
+ * TranslatedChapter Styles (Hackathon Bonus Feature 3)
+ * T089: Side-by-side layout styling - Robotics Theme
+ */
+
+.container {
+  margin: 2rem 0;
+  border: 2px solid rgba(0, 212, 255, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 212, 255, 0.1);
+}
+
+/* Call-to-action (before translation) */
+.callToAction {
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #1a1f2e 0%, #252d3d 100%);
+  text-align: center;
+}
+
+.ctaContent h3 {
+  margin: 0 0 0.8rem 0;
+  font-size: 1.6rem;
+  color: #00d4ff;
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+}
+
+.ctaContent p {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.05rem;
+  color: #c0c7d4;
+}
+
+.translateButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.9rem 2rem;
+  background: linear-gradient(135deg, #00d4ff 0%, #0ea5e9 100%);
+  color: #0f1419;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3), 0 0 40px rgba(0, 212, 255, 0.2);
+}
+
+.translateButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 30px rgba(0, 212, 255, 0.4), 0 0 60px rgba(0, 212, 255, 0.3);
+}
+
+.translateButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 3px solid rgba(0, 212, 255, 0.2);
+  border-top-color: #00d4ff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #1a1f2e 0%, #252d3d 100%);
+  border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  background: linear-gradient(135deg, #00d4ff 0%, #0ea5e9 100%);
+  color: #0f1419;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.4);
+}
+
+.badgeIcon {
+  font-size: 1.2rem;
+}
+
+/* Display mode controls */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.label {
+  font-weight: 600;
+  color: #c0c7d4;
+  font-size: 0.9rem;
+}
+
+.toggleGroup {
+  display: flex;
+  gap: 0.3rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.3rem;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+}
+
+.toggleButton {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: #c0c7d4;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toggleButton:hover {
+  background: rgba(0, 212, 255, 0.1);
+  color: #00d4ff;
+}
+
+.toggleButton.active {
+  background: #00d4ff;
+  color: #0f1419;
+  box-shadow: 0 2px 6px rgba(0, 212, 255, 0.4);
+}
+
+/* Content area */
+.content {
+  display: flex;
+  background: #1a1f2e;
+  min-height: 400px;
+}
+
+.column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.column.dual {
+  flex: 1;
+}
+
+.column.single {
+  flex: 1;
+  max-width: 100%;
+}
+
+.columnHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: rgba(37, 45, 61, 0.8);
+  border-bottom: 2px solid rgba(0, 212, 255, 0.3);
+  font-weight: 600;
+  color: #00d4ff;
+  font-size: 0.95rem;
+}
+
+.flag {
+  font-size: 1.3rem;
+}
+
+.columnContent {
+  flex: 1;
+  padding: 2rem 2.5rem;
+  overflow-y: auto;
+  line-height: 1.8;
+  font-size: 1.05rem;
+  color: #e5e8ed;
+  background: rgba(26, 31, 46, 0.5);
+}
+
+/* Urdu specific styling */
+.columnContent.urdu {
+  direction: rtl;
+  text-align: right;
+  font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+  font-size: 1.15rem;
+  line-height: 2;
+}
+
+.divider {
+  width: 2px;
+  background: linear-gradient(180deg, rgba(0, 212, 255, 0.2) 0%, rgba(0, 212, 255, 0.5) 50%, rgba(0, 212, 255, 0.2) 100%);
+}
+
+/* Markdown content styling */
+.columnContent h1 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+  color: #00d4ff;
+  border-bottom: 3px solid rgba(0, 212, 255, 0.3);
+  padding-bottom: 0.5rem;
+  text-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+}
+
+.columnContent h2 {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  font-size: 1.6rem;
+  color: #00d4ff;
+}
+
+.columnContent h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
+  font-size: 1.3rem;
+  color: #00ffea;
+}
+
+.columnContent p {
+  margin-bottom: 1.2rem;
+}
+
+.columnContent code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+  color: #00ffea;
+}
+
+/* Footer */
+.footer {
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #1a1f2e 0%, #252d3d 100%);
+  border-top: 2px solid rgba(0, 212, 255, 0.3);
+}
+
+.footerText {
+  margin: 0;
+  color: #c0c7d4;
+  font-size: 0.9rem;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Error message */
+.errorMessage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding: 0.8rem 1.2rem;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-left: 4px solid #ef4444;
+  border-radius: 8px;
+  color: #fca5a5;
+  font-size: 0.95rem;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Responsive design */
+@media (max-width: 968px) {
+  .content {
+    flex-direction: column;
+  }
+
+  .column.dual {
+    flex: none;
+    width: 100%;
+  }
+
+  .divider {
+    width: 100%;
+    height: 2px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .controls {
+    justify-content: center;
+  }
+
+  .columnContent {
+    padding: 1.5rem 1.2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .toggleGroup {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .toggleButton {
+    width: 100%;
+    text-align: center;
+  }
+
+  .callToAction {
+    padding: 2rem 1.5rem;
+  }
+
+  .ctaContent h3 {
+    font-size: 1.3rem;
+  }
+
+  .ctaContent p {
+    font-size: 0.95rem;
+  }
+}

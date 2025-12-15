@@ -1,3 +1,8 @@
+---
+chapterId: 4
+title: "Chapter 4: Digital Twin Simulation"
+---
+
 # Chapter 4: Digital Twin Simulation
 
 ## Learning Objectives

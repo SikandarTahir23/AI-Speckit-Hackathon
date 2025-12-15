@@ -1,3 +1,8 @@
+---
+chapterId: 2
+title: "Chapter 2: Basics of Humanoid Robotics"
+---
+
 # Chapter 2: Basics of Humanoid Robotics
 
 ## Learning Objectives

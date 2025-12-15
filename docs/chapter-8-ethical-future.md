@@ -1,3 +1,8 @@
+---
+chapterId: 8
+title: "Chapter 8: Ethical and Future Implications"
+---
+
 # Chapter 8: Ethical and Future Implications
 
 ## 8.1 Introduction to Ethical and Future Implications

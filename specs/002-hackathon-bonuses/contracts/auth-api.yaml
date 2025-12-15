@@ -1,0 +1,363 @@
+openapi: 3.0.3
+info:
+  title: Authentication API
+  description: |
+    User authentication and profile management for Hackathon Bonus Feature 1.
+
+    Provides signup, signin, signout, and profile retrieval endpoints using FastAPI-Users
+    with persistent session management stored in Neon PostgreSQL.
+
+    **Bonus Points**: 50/125
+  version: 1.0.0
+  contact:
+    name: RAG Chatbot Team
+    email: support@example.com
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://api.production.com
+    description: Production server
+
+tags:
+  - name: Authentication
+    description: User signup, signin, and session management
+  - name: Profile
+    description: User profile retrieval and updates
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - Authentication
+      summary: Register new user account
+      description: |
+        Create a new user account with email, password, and profile information.
+
+        **Functional Requirements**: FR-001, FR-002, FR-003, FR-007, FR-008
+
+        **Profile Questions (collected at signup)**:
+        - Software background: Beginner / Intermediate / Advanced
+        - Hardware/robotics background: None / Basic / Hands-on
+        - Familiarity: Python, ROS/ROS2, AI/ML (boolean flags)
+
+        **Success Criteria**: SC-001 (signup in <3 minutes), SC-006 (95% success rate)
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            examples:
+              beginner:
+                summary: Beginner user with no prior experience
+                value:
+                  email: beginner@example.com
+                  password: SecurePass123!
+                  software_background: Beginner
+                  hardware_background: None
+                  python_familiar: false
+                  ros_familiar: false
+                  aiml_familiar: false
+              intermediate:
+                summary: Intermediate user with some experience
+                value:
+                  email: intermediate@example.com
+                  password: SecurePass123!
+                  software_background: Intermediate
+                  hardware_background: Basic
+                  python_familiar: true
+                  ros_familiar: false
+                  aiml_familiar: true
+      responses:
+        '201':
+          description: User account created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Invalid request (validation errors)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidEmail:
+                  summary: Invalid email format
+                  value:
+                    error: validation_error
+                    message: Invalid email format
+                    details: { field: email, issue: not_valid_email }
+                weakPassword:
+                  summary: Password too weak
+                  value:
+                    error: validation_error
+                    message: Password must be at least 8 characters with 1 uppercase, 1 lowercase, 1 digit
+                    details: { field: password, issue: weak_password }
+        '409':
+          description: Email already in use (FR-007)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: conflict
+                message: Email already in use
+                details: { email: user@example.com }
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Sign in to existing account
+      description: |
+        Authenticate user with email and password. Returns session cookie for persistent login.
+
+        **Functional Requirements**: FR-005, FR-004 (persistent sessions)
+
+        **Success Criteria**: SC-002 (persistent across browser restarts)
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: user@example.com
+              password: SecurePass123!
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Set-Cookie:
+              description: Session cookie (7-day expiration for persistent login)
+              schema:
+                type: string
+                example: session=abc123...; Max-Age=604800; Path=/; HttpOnly; SameSite=Lax
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: authentication_failed
+                message: Invalid email or password
+                details: {}
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Sign out and terminate session
+      description: |
+        Log out the current user and invalidate session.
+
+        **Functional Requirements**: FR-006
+      operationId: logoutUser
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Successfully logged out
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: unauthorized
+                message: Not authenticated
+                details: {}
+
+  /auth/me:
+    get:
+      tags:
+        - Profile
+      summary: Get current user profile
+      description: |
+        Retrieve authenticated user's profile information including background questions.
+
+        **Functional Requirements**: FR-009 (display user auth state)
+      operationId: getCurrentUser
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: User profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: unauthorized
+                message: Please sign in to access your profile
+                details: {}
+
+components:
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - password
+        - software_background
+        - hardware_background
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          description: User email address (used for login)
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          minLength: 8
+          maxLength: 128
+          description: User password (min 8 chars, 1 uppercase, 1 lowercase, 1 digit)
+          example: SecurePass123!
+        software_background:
+          type: string
+          enum: [Beginner, Intermediate, Advanced]
+          description: Self-assessed software development skill level
+          example: Intermediate
+        hardware_background:
+          type: string
+          enum: [None, Basic, Hands-on]
+          description: Hardware/robotics hands-on experience level
+          example: Basic
+        python_familiar:
+          type: boolean
+          default: false
+          description: Familiar with Python programming language
+          example: true
+        ros_familiar:
+          type: boolean
+          default: false
+          description: Familiar with ROS (Robot Operating System) or ROS2
+          example: false
+        aiml_familiar:
+          type: boolean
+          default: false
+          description: Familiar with AI/ML concepts and frameworks
+          example: true
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          description: User password
+          example: SecurePass123!
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique user identifier
+          example: 1
+        email:
+          type: string
+          format: email
+          description: User email address
+          example: user@example.com
+        is_active:
+          type: boolean
+          description: Account active status
+          example: true
+        is_verified:
+          type: boolean
+          description: Email verification status
+          example: false
+        software_background:
+          type: string
+          enum: [Beginner, Intermediate, Advanced]
+          example: Intermediate
+        hardware_background:
+          type: string
+          enum: [None, Basic, Hands-on]
+          example: Basic
+        python_familiar:
+          type: boolean
+          example: true
+        ros_familiar:
+          type: boolean
+          example: false
+        aiml_familiar:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+          description: Account creation timestamp (UTC)
+          example: "2025-12-14T10:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: Last profile update timestamp (UTC)
+          example: "2025-12-14T10:00:00Z"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: validation_error
+        message:
+          type: string
+          description: Human-readable error message
+          example: Invalid email format
+        details:
+          type: object
+          additionalProperties: true
+          description: Additional error context
+          example: { field: email, issue: not_valid_email }
+        request_id:
+          type: string
+          format: uuid
+          description: Unique request identifier for debugging
+          example: 550e8400-e29b-41d4-a716-446655440000
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session
+      description: Session cookie (automatically set on login, 7-day expiration)
