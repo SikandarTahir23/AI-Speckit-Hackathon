@@ -1,3 +1,8 @@
+---
+chapterId: 7
+title: "Chapter 7: Vision-Language-Action (VLA) Systems"
+---
+
 # Chapter 7: Vision-Language-Action (VLA) Systems
 
 ## Learning Objectives

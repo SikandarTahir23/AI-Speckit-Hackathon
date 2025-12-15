@@ -10,8 +10,14 @@ const config: Config = {
   favicon: 'img/favicon.ico',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
-  future: {
-    v4: true, // Improve compatibility with the upcoming Docusaurus v4
+  // future: {
+  //   v4: true, // Improve compatibility with the upcoming Docusaurus v4
+  // },
+
+  // Custom fields for hackathon bonus features
+  customFields: {
+    API_BASE_URL: process.env.API_BASE_URL || 'http://localhost:8000',
+    AUTH_BASE_URL: process.env.AUTH_BASE_URL || 'http://localhost:3001',
   },
 
   // Set the production url of your site here
@@ -74,28 +80,33 @@ const config: Config = {
     image: 'img/docusaurus-social-card.jpg',
     colorMode: {
       respectPrefersColorScheme: true,
+      disableSwitch: true, // Disable default toggle, use custom one
     },
     navbar: {
-      title: 'Physical AI & Humanoid Robotics Textbook',
+      title: 'Physical AI',
       logo: {
-        alt: 'My Site Logo',
+        alt: 'AI Logo',
         src: 'img/logo.svg',
       },
       items: [
         {
-          type: 'docSidebar',
-          sidebarId: 'tutorialSidebar',
+          type: 'custom-book',
           position: 'left',
-          label: 'Book',
         },
-        // {
-        //   to: '/blog',
-        //   label: 'Blog', 
-        //   position: 'left'
-        // },
         {
-          href: 'https://github.com/facebook/docusaurus',
-          label: 'GitHub',
+          type: 'custom-about',
+          position: 'left',
+        },
+        {
+          type: 'custom-curriculum',
+          position: 'left',
+        },
+        {
+          type: 'custom-color-toggle',
+          position: 'right',
+        },
+        {
+          type: 'custom-login',
           position: 'right',
         },
       ],
@@ -107,7 +118,7 @@ const config: Config = {
           title: 'Docs',
           items: [
             {
-              label: 'Tutorial',
+              label: 'Book',
               to: '/docs/chapter-1-introduction-to-physical-ai',
             },
           ],

@@ -1,0 +1,324 @@
+openapi: 3.0.3
+info:
+  title: Personalization API
+  description: |
+    Chapter content personalization based on user skill level for Hackathon Bonus Feature 2.
+
+    Provides AI-powered content rewriting at Beginner, Intermediate, or Advanced difficulty levels
+    using OpenAI GPT-3.5-turbo with caching for performance optimization.
+
+    **Bonus Points**: 50/125
+  version: 1.0.0
+  contact:
+    name: RAG Chatbot Team
+    email: support@example.com
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://api.production.com
+    description: Production server
+
+tags:
+  - name: Personalization
+    description: Chapter content adaptation to user skill level
+
+paths:
+  /personalize:
+    post:
+      tags:
+        - Personalization
+      summary: Get personalized chapter content
+      description: |
+        Request a chapter rewritten for a specific difficulty level (Beginner/Intermediate/Advanced).
+
+        **Functional Requirements**: FR-010, FR-011, FR-012, FR-013, FR-016, FR-017
+
+        **Success Criteria**: SC-003 (delivery within 10s for <3000 words)
+
+        **Workflow**:
+        1. Check if cached personalized version exists
+        2. If cached: Return immediately (SC-004: <2s)
+        3. If not cached: Call OpenAI API to rewrite chapter, cache result, return
+        4. If OpenAI fails: Return original content with error flag (FR-016)
+
+        **Authentication**: Requires authenticated user (FR-017)
+      operationId: personalizeChapter
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonalizationRequest'
+            examples:
+              beginner:
+                summary: Request beginner-level content
+                value:
+                  chapter_id: 3
+                  difficulty_level: Beginner
+              advanced:
+                summary: Request advanced-level content
+                value:
+                  chapter_id: 3
+                  difficulty_level: Advanced
+      responses:
+        '200':
+          description: Personalized content delivered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalizationResponse'
+              examples:
+                cached:
+                  summary: Cached content (fast retrieval)
+                  value:
+                    chapter_id: 3
+                    chapter_title: "Actuation Systems"
+                    difficulty_level: Beginner
+                    personalized_content: "Actuators are devices that create movement in robots. Think of them like muscles in a human body..."
+                    original_length: 2500
+                    personalized_length: 3200
+                    cached: true
+                    processing_time_ms: 150
+                fresh:
+                  summary: Newly generated content
+                  value:
+                    chapter_id: 3
+                    chapter_title: "Actuation Systems"
+                    difficulty_level: Advanced
+                    personalized_content: "Hydraulic actuators exhibit force density characteristics optimized for high-torque applications..."
+                    original_length: 2500
+                    personalized_length: 2100
+                    cached: false
+                    processing_time_ms: 8500
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidLevel:
+                  summary: Invalid difficulty level
+                  value:
+                    error: validation_error
+                    message: "difficulty_level must be one of: Beginner, Intermediate, Advanced"
+                    details: { field: difficulty_level, provided: Expert }
+                invalidChapter:
+                  summary: Chapter not found
+                  value:
+                    error: not_found
+                    message: Chapter with id 99 does not exist
+                    details: { chapter_id: 99 }
+        '401':
+          description: Not authenticated (FR-017)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: unauthorized
+                message: Please sign in to access personalized content
+                details: {}
+        '500':
+          description: Personalization failed (OpenAI API error)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalizationErrorResponse'
+              example:
+                error: personalization_failed
+                message: Unable to personalize content. Showing original chapter.
+                fallback_content: "Original chapter content here..."
+                details:
+                  reason: openai_api_timeout
+                  retry_recommended: true
+
+  /personalize/status:
+    get:
+      tags:
+        - Personalization
+      summary: Check personalization cache status
+      description: |
+        Get statistics on cached personalized content for monitoring and pre-generation validation.
+
+        **Use Case**: Verify pre-generation script success before hackathon demo
+      operationId: getPersonalizationStatus
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Cache statistics retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CacheStatusResponse'
+
+components:
+  schemas:
+    PersonalizationRequest:
+      type: object
+      required:
+        - chapter_id
+        - difficulty_level
+      properties:
+        chapter_id:
+          type: integer
+          description: ID of the chapter to personalize (must exist in chapters table)
+          minimum: 1
+          maximum: 8
+          example: 3
+        difficulty_level:
+          type: string
+          enum: [Beginner, Intermediate, Advanced]
+          description: Target difficulty level for content rewriting
+          example: Beginner
+
+    PersonalizationResponse:
+      type: object
+      required:
+        - chapter_id
+        - chapter_title
+        - difficulty_level
+        - personalized_content
+        - cached
+      properties:
+        chapter_id:
+          type: integer
+          description: Chapter identifier
+          example: 3
+        chapter_title:
+          type: string
+          description: Chapter title
+          example: "Actuation Systems"
+        difficulty_level:
+          type: string
+          enum: [Beginner, Intermediate, Advanced]
+          description: Difficulty level of returned content
+          example: Beginner
+        personalized_content:
+          type: string
+          description: AI-rewritten chapter content tailored to difficulty level
+          example: "Actuators are devices that create movement in robots. Think of them like muscles in a human body..."
+        original_length:
+          type: integer
+          description: Word count of original chapter
+          example: 2500
+        personalized_length:
+          type: integer
+          description: Word count of personalized version
+          example: 3200
+        cached:
+          type: boolean
+          description: Whether this content was retrieved from cache (true) or freshly generated (false)
+          example: true
+        processing_time_ms:
+          type: integer
+          description: Processing time in milliseconds (includes OpenAI API call if not cached)
+          example: 150
+
+    PersonalizationErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+        - fallback_content
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: personalization_failed
+        message:
+          type: string
+          description: Human-readable error message
+          example: Unable to personalize content. Showing original chapter.
+        fallback_content:
+          type: string
+          description: Original chapter content (graceful degradation per FR-016)
+          example: "Hydraulic actuators provide high force density..."
+        details:
+          type: object
+          properties:
+            reason:
+              type: string
+              description: Underlying failure reason
+              example: openai_api_timeout
+            retry_recommended:
+              type: boolean
+              description: Whether retrying the request might succeed
+              example: true
+          additionalProperties: true
+
+    CacheStatusResponse:
+      type: object
+      properties:
+        total_chapters:
+          type: integer
+          description: Total number of chapters in the book
+          example: 8
+        cached_combinations:
+          type: integer
+          description: Number of (chapter, difficulty_level) combinations cached
+          example: 24
+        expected_combinations:
+          type: integer
+          description: Expected total (total_chapters × 3 difficulty levels)
+          example: 24
+        cache_coverage_percent:
+          type: number
+          format: float
+          description: Percentage of expected combinations that are cached
+          example: 100.0
+        breakdown:
+          type: array
+          description: Per-chapter cache status
+          items:
+            type: object
+            properties:
+              chapter_id:
+                type: integer
+                example: 3
+              chapter_title:
+                type: string
+                example: "Actuation Systems"
+              beginner_cached:
+                type: boolean
+                example: true
+              intermediate_cached:
+                type: boolean
+                example: true
+              advanced_cached:
+                type: boolean
+                example: true
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: validation_error
+        message:
+          type: string
+          description: Human-readable error message
+          example: Invalid difficulty level
+        details:
+          type: object
+          additionalProperties: true
+          description: Additional error context
+        request_id:
+          type: string
+          format: uuid
+          description: Unique request identifier for debugging
+
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: session
+      description: Session cookie (set on login)

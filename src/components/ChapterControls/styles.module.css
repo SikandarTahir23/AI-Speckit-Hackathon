@@ -1,15 +1,15 @@
 /**
  * ChapterControls Styles (Hackathon Bonus Feature 2)
- * T058: Component styling
+ * T058: Component styling - Robotics Theme
  */
 
 .controls {
   margin: 2rem 0;
   padding: 1.5rem;
-  border: 2px solid #e0e0e0;
+  border: 2px solid rgba(0, 212, 255, 0.3);
   border-radius: 12px;
-  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  background: linear-gradient(135deg, #1a1f2e 0%, #252d3d 100%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 212, 255, 0.1);
 }
 
 .header {
@@ -20,13 +20,14 @@
   margin: 0 0 0.4rem 0;
   font-size: 1.3rem;
   font-weight: 600;
-  color: #2d3748;
+  color: #00d4ff;
+  text-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
 }
 
 .subtitle {
   margin: 0;
   font-size: 0.95rem;
-  color: #718096;
+  color: #c0c7d4;
 }
 
 .buttonGroup {
@@ -40,11 +41,11 @@
   flex: 1;
   min-width: 140px;
   padding: 1rem 1.2rem;
-  border: 2px solid #cbd5e0;
+  border: 2px solid rgba(0, 212, 255, 0.3);
   border-radius: 8px;
-  background: white;
+  background: rgba(37, 45, 61, 0.5);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -53,21 +54,21 @@
 }
 
 .levelButton:hover:not(:disabled) {
-  border-color: #4299e1;
-  background: #ebf8ff;
+  border-color: #00d4ff;
+  background: rgba(0, 212, 255, 0.1);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(66, 153, 225, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.3);
 }
 
 .levelButton:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .levelButton.selected {
-  border-color: #3182ce;
-  background: #ebf8ff;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+  border-color: #00d4ff;
+  background: rgba(0, 212, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.2), 0 0 30px rgba(0, 212, 255, 0.3);
 }
 
 .icon {
@@ -77,16 +78,17 @@
 .label {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #2d3748;
+  color: #e5e8ed;
 }
 
 .check {
   position: absolute;
   top: 0.4rem;
   right: 0.4rem;
-  color: #38a169;
+  color: #00ffea;
   font-size: 1.2rem;
   font-weight: bold;
+  text-shadow: 0 0 10px rgba(0, 255, 234, 0.5);
 }
 
 .loadingState {
@@ -94,7 +96,8 @@
   align-items: center;
   gap: 0.8rem;
   padding: 1rem;
-  background: #edf2f7;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 212, 255, 0.2);
   border-radius: 8px;
   margin-top: 1rem;
 }
@@ -102,8 +105,8 @@
 .spinner {
   width: 20px;
   height: 20px;
-  border: 3px solid #cbd5e0;
-  border-top-color: #4299e1;
+  border: 3px solid rgba(0, 212, 255, 0.2);
+  border-top-color: #00d4ff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -116,7 +119,7 @@
 
 .loadingState p {
   margin: 0;
-  color: #4a5568;
+  color: #c0c7d4;
   font-size: 0.95rem;
 }
 
@@ -125,11 +128,12 @@
   align-items: center;
   gap: 0.6rem;
   padding: 1rem;
-  background: #fff5f5;
-  border: 1px solid #fc8181;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-left: 4px solid #ef4444;
   border-radius: 8px;
   margin-top: 1rem;
-  color: #c53030;
+  color: #fca5a5;
   font-size: 0.95rem;
 }
 
@@ -142,11 +146,12 @@
   align-items: center;
   gap: 0.6rem;
   padding: 1rem;
-  background: #f0fff4;
-  border: 1px solid #68d391;
+  background: rgba(0, 255, 234, 0.1);
+  border: 1px solid rgba(0, 255, 234, 0.3);
+  border-left: 4px solid #00ffea;
   border-radius: 8px;
   margin-top: 1rem;
-  color: #2f855a;
+  color: #00ffea;
   font-size: 0.95rem;
 }
 
@@ -158,15 +163,15 @@
 .unauthenticated {
   margin: 2rem 0;
   padding: 1.5rem;
-  border: 2px dashed #cbd5e0;
+  border: 2px dashed rgba(0, 212, 255, 0.3);
   border-radius: 12px;
-  background: #f7fafc;
+  background: rgba(0, 0, 0, 0.2);
   text-align: center;
 }
 
 .unauthenticated .message {
   margin: 0;
-  color: #4a5568;
+  color: #c0c7d4;
   font-size: 1rem;
 }
 

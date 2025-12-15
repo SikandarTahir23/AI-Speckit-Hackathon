@@ -1,3 +1,8 @@
+---
+chapterId: 3
+title: "Chapter 3: AI and Control Systems for Humanoids"
+---
+
 # Chapter 3: AI and Control Systems for Humanoids
 
 ## 3.1 Introduction to AI and Control for Humanoids

@@ -1,0 +1,325 @@
+openapi: 3.0.3
+info:
+  title: RAG Chatbot API - History Endpoints
+  description: |
+    Conversation history management endpoints. Enables users to retrieve
+    and clear their chat history within a session.
+  version: 1.0.0
+  contact:
+    name: RAG Chatbot Team
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://api.rag-chatbot.example.com
+    description: Production server
+
+paths:
+  /history/{session_id}:
+    get:
+      summary: Retrieve conversation history for a session
+      description: |
+        Fetch all messages (Q&A pairs) for the specified session in chronological order.
+        Supports pagination for large conversation histories.
+
+        **Use Cases**:
+        - Display full conversation when user returns to session
+        - Show conversation context for follow-up questions
+        - Export conversation for reference
+
+        **Performance**: Returns up to 50 messages by default (max per session)
+      operationId: getConversationHistory
+      tags:
+        - History
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: Session UUID to retrieve history for
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        - name: limit
+          in: query
+          required: false
+          description: Maximum number of messages to return (default 50)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+          example: 20
+        - name: offset
+          in: query
+          required: false
+          description: Number of messages to skip (for pagination)
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          example: 0
+      responses:
+        '200':
+          description: Successful retrieval of conversation history
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HistoryResponse'
+              examples:
+                fullHistory:
+                  summary: Complete conversation history
+                  value:
+                    session_id: "550e8400-e29b-41d4-a716-446655440000"
+                    messages:
+                      - id: "660e8400-e29b-41d4-a716-446655440000"
+                        query: "What are hydraulic actuators?"
+                        answer: "Hydraulic actuators are devices that convert hydraulic pressure..."
+                        citations:
+                          - chapter: "Chapter 3: Actuation Systems"
+                            section: "3.2 Hydraulic Actuators"
+                            paragraph: 5
+                        timestamp: "2025-12-13T10:30:00Z"
+                      - id: "670e8400-e29b-41d4-a716-446655440000"
+                        query: "What about electric actuators?"
+                        answer: "Electric actuators use electric motors to produce mechanical motion..."
+                        citations:
+                          - chapter: "Chapter 3: Actuation Systems"
+                            section: "3.3 Electric Actuators"
+                            paragraph: 2
+                        timestamp: "2025-12-13T10:32:15Z"
+                    total_count: 2
+                    limit: 50
+                    offset: 0
+                emptyHistory:
+                  summary: No messages in session yet
+                  value:
+                    session_id: "550e8400-e29b-41d4-a716-446655440000"
+                    messages: []
+                    total_count: 0
+                    limit: 50
+                    offset: 0
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "not_found"
+                message: "Session ID '550e8400-invalid' not found"
+                details:
+                  resource: "session"
+                request_id: "req_123461"
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "validation_error"
+                message: "Invalid session_id format. Must be a valid UUID."
+                details:
+                  field: "session_id"
+                  constraint: "uuid_format"
+                request_id: "req_123462"
+
+    delete:
+      summary: Clear conversation history for a session
+      description: |
+        Marks the session as 'cleared' and deletes all associated messages.
+        This action is irreversible. Use for:
+        - User clicks "New Conversation" or "Clear History" button
+        - User wants to start fresh on a new topic
+        - Privacy/data cleanup requests
+
+        **State Transition**: active → cleared (terminal state)
+      operationId: clearConversationHistory
+      tags:
+        - History
+      parameters:
+        - name: session_id
+          in: path
+          required: true
+          description: Session UUID to clear
+          schema:
+            type: string
+            format: uuid
+          example: "550e8400-e29b-41d4-a716-446655440000"
+      responses:
+        '200':
+          description: Conversation history successfully cleared
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClearResponse'
+              example:
+                session_id: "550e8400-e29b-41d4-a716-446655440000"
+                deleted_count: 5
+                message: "Conversation history cleared successfully"
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "not_found"
+                message: "Session ID '550e8400-invalid' not found"
+                details:
+                  resource: "session"
+                request_id: "req_123463"
+        '409':
+          description: Session already cleared or expired
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "conflict"
+                message: "Session is already in 'cleared' state"
+                details:
+                  current_state: "cleared"
+                request_id: "req_123464"
+
+components:
+  schemas:
+    HistoryResponse:
+      type: object
+      required:
+        - session_id
+        - messages
+        - total_count
+        - limit
+        - offset
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          description: Session UUID
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageItem'
+          description: List of Q&A pairs in chronological order (oldest first)
+        total_count:
+          type: integer
+          description: Total number of messages in the session
+          example: 15
+        limit:
+          type: integer
+          description: Maximum messages returned in this response
+          example: 50
+        offset:
+          type: integer
+          description: Number of messages skipped (pagination)
+          example: 0
+
+    MessageItem:
+      type: object
+      required:
+        - id
+        - query
+        - answer
+        - citations
+        - timestamp
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique message ID
+          example: "660e8400-e29b-41d4-a716-446655440000"
+        query:
+          type: string
+          description: User's question
+          example: "What are hydraulic actuators?"
+        answer:
+          type: string
+          description: Chatbot's answer
+          example: "Hydraulic actuators are devices that convert hydraulic pressure into mechanical motion..."
+        citations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Citation'
+          description: Citations for the answer
+        timestamp:
+          type: string
+          format: date-time
+          description: Message creation time (UTC ISO-8601)
+          example: "2025-12-13T10:30:00Z"
+
+    Citation:
+      type: object
+      required:
+        - chapter
+      properties:
+        chapter:
+          type: string
+          description: Chapter reference
+          example: "Chapter 3: Actuation Systems"
+        section:
+          type: string
+          nullable: true
+          description: Section reference (optional)
+          example: "3.2 Hydraulic Actuators"
+        paragraph:
+          type: integer
+          nullable: true
+          description: Paragraph index (optional)
+          example: 5
+
+    ClearResponse:
+      type: object
+      required:
+        - session_id
+        - deleted_count
+        - message
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          description: Cleared session UUID
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        deleted_count:
+          type: integer
+          description: Number of messages deleted
+          example: 5
+        message:
+          type: string
+          description: Confirmation message
+          example: "Conversation history cleared successfully"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+        - request_id
+      properties:
+        error:
+          type: string
+          description: Error code
+          enum:
+            - validation_error
+            - not_found
+            - conflict
+            - internal_error
+          example: "not_found"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Session ID not found"
+        details:
+          type: object
+          description: Additional error context
+          additionalProperties: true
+        request_id:
+          type: string
+          description: Unique request ID for debugging
+          example: "req_123461"
+
+tags:
+  - name: History
+    description: Conversation history management

@@ -1,14 +1,16 @@
 """
-Translation Agent - OpenAI Integration for Urdu Translation
+Translation Agent - Google Gemini Integration for Urdu Translation
 
 Implements Phase 5 (US3): Urdu Translation
 Translates book content to Urdu while preserving technical terms.
+Uses Google Gemini API for fast, accurate translation.
 """
 
 from typing import Optional
-from openai import AsyncOpenAI
+import google.generativeai as genai
 from utils.config import settings
 from utils.logger import setup_logger
+import os
 
 logger = setup_logger(__name__)
 
@@ -52,23 +54,28 @@ class TranslationAgent:
     """
     Agent for translating chapter content to Urdu.
 
-    Uses OpenAI GPT-3.5-turbo to translate content while preserving
+    Uses Google Gemini API to translate content while preserving
     technical terms in English for clarity and consistency.
     """
 
     def __init__(self):
-        """Initialize translation agent with async OpenAI client."""
-        self.client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
-        self.model = "gpt-3.5-turbo"  # Fast and cost-effective for translation
+        """Initialize translation agent with Google Gemini."""
+        gemini_api_key = os.getenv('GEMINI_API_KEY') or settings.GEMINI_API_KEY if hasattr(settings, 'GEMINI_API_KEY') else None
 
-        logger.info(f"TranslationAgent initialized with model: {self.model}")
+        if not gemini_api_key:
+            raise ValueError("GEMINI_API_KEY not found in environment or settings")
+
+        genai.configure(api_key=gemini_api_key)
+        self.model = genai.GenerativeModel('gemini-1.5-flash')  # Fast and efficient
+
+        logger.info(f"TranslationAgent initialized with Gemini Flash")
 
     async def translate_to_urdu(
         self,
         content: str,
     ) -> Optional[str]:
         """
-        Translate content from English to Urdu.
+        Translate content from English to Urdu using Google Gemini.
 
         Args:
             content: Original English chapter content to translate
@@ -77,32 +84,26 @@ class TranslationAgent:
             Urdu translated text, or None if translation fails
 
         Raises:
-            Exception: If OpenAI API call fails
+            Exception: If Gemini API call fails
         """
-        logger.info(f"Translating content to Urdu ({len(content)} chars)")
+        logger.info(f"Translating content to Urdu with Gemini ({len(content)} chars)")
 
         try:
             # Format prompt with content
             prompt = URDU_TRANSLATION_PROMPT.format(content=content)
 
-            # Call OpenAI API
-            response = await self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are an expert technical translator specializing in English to Urdu translation for AI and robotics documentation."
-                    },
-                    {
-                        "role": "user",
-                        "content": prompt
-                    }
-                ],
-                temperature=0.3,  # Low temperature for consistent, accurate translation
-                max_tokens=2500,  # Sufficient for chapter content translation
+            # Call Gemini API (synchronous - Gemini SDK doesn't have async yet)
+            import asyncio
+            response = await asyncio.to_thread(
+                self.model.generate_content,
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.3,  # Low temperature for consistent translation
+                    max_output_tokens=2500,
+                )
             )
 
-            translated_text = response.choices[0].message.content.strip()
+            translated_text = response.text.strip()
 
             logger.info(f"Successfully translated content to Urdu ({len(translated_text)} chars)")
 

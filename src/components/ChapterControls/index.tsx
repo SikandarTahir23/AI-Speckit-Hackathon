@@ -1,3 +1,4 @@
+
 /**
  * ChapterControls Component (Hackathon Bonus Feature 2)
  *

@@ -1,0 +1,120 @@
+.chapters {
+  padding: 6rem 0;
+  background-color: var(--robot-dark-navy);
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 4rem;
+}
+
+.sectionTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--robot-metal-light);
+  margin-bottom: 1rem;
+}
+
+.sectionSubtitle {
+  font-size: 1.125rem;
+  color: var(--robot-silver);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.chaptersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.chapterCard {
+  background: var(--robot-panel-dark);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: var(--ifm-card-border-radius);
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.chapterCard:hover {
+  transform: translateY(-5px);
+  border-color: var(--robot-electric-blue);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.chapterNumber {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--ifm-color-emphasis-300);
+  line-height: 1;
+  transition: color 0.3s ease;
+}
+
+.chapterCard:hover .chapterNumber {
+  color: var(--robot-electric-blue);
+}
+
+.chapterTags {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tag {
+  background-color: var(--robot-surface);
+  color: var(--robot-cyan);
+  padding: 0.25rem 0.75rem;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.chapterTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--robot-metal-light);
+  margin: 0 0 1rem 0;
+  line-height: 1.4;
+}
+
+.chapterDescription {
+  color: var(--robot-silver);
+  font-size: 1rem;
+  line-height: 1.6;
+  flex-grow: 1;
+  margin-bottom: 1.5rem;
+}
+
+.cardFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--robot-electric-blue);
+  font-weight: 600;
+  margin-top: auto;
+}
+
+.arrowIcon {
+  transition: transform 0.3s ease;
+}
+
+.chapterCard:hover .arrowIcon {
+  transform: translateX(5px);
+}

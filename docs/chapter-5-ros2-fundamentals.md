@@ -1,3 +1,8 @@
+---
+chapterId: 5
+title: "Chapter 5: ROS 2 Fundamentals"
+---
+
 # Chapter 5: ROS 2 Fundamentals
 
 ## Learning Objectives

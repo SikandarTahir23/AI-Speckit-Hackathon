@@ -47,36 +47,27 @@ async def health_check():
 
 # T021: Pydantic request/response schemas with profile fields
 
-class UserRead(BaseModel):
+class UserRead(schemas.BaseUser[int]):
     """
     User response schema (returned after login/registration).
 
     Includes authentication fields and profile data.
     """
-    id: int
-    email: str
-    is_active: bool
-    is_superuser: bool
-    is_verified: bool
     software_background: str
     hardware_background: str
     python_familiar: bool
     ros_familiar: bool
     aiml_familiar: bool
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
-class UserCreate(BaseModel):
+class UserCreate(schemas.BaseUserCreate):
     """
     User registration schema (required fields for signup).
 
     Extends base authentication with profile questions (FR-003 from spec.md).
     """
-    email: EmailStr = PydField(description="User email address")
-    password: str = PydField(min_length=8, description="Password (min 8 chars)")
-
     # Profile fields (required at signup)
     software_background: SoftwareBackground = PydField(
         description="Software development experience: Beginner, Intermediate, or Advanced"

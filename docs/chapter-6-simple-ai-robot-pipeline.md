@@ -1,3 +1,8 @@
+---
+chapterId: 6
+title: "Chapter 6: Capstone - Simple AI-Robot Pipeline"
+---
+
 # Chapter 6: Capstone - Simple AI-Robot Pipeline
 
 This chapter guides you through building a complete AI-robot pipeline, integrating perception, cognition, planning, and control using ROS 2, OpenCV, and MoveIt.

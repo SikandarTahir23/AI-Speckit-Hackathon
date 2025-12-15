@@ -1,0 +1,317 @@
+openapi: 3.0.3
+info:
+  title: Translation API
+  description: |
+    Urdu translation service for chapter content for Hackathon Bonus Feature 3.
+
+    Provides AI-powered English-to-Urdu translation using OpenAI GPT-3.5-turbo with
+    aggressive caching for performance optimization and side-by-side display support.
+
+    **Bonus Points**: 25/125
+  version: 1.0.0
+  contact:
+    name: RAG Chatbot Team
+    email: support@example.com
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://api.production.com
+    description: Production server
+
+tags:
+  - name: Translation
+    description: Chapter translation to Urdu with caching
+
+paths:
+  /translate:
+    post:
+      tags:
+        - Translation
+      summary: Translate chapter to Urdu
+      description: |
+        Translate a chapter from English to Urdu with technical term preservation.
+
+        **Functional Requirements**: FR-018, FR-019, FR-020, FR-021, FR-022, FR-026
+
+        **Success Criteria**:
+        - SC-004 (cached translations in <2s)
+        - SC-005 (uncached translations in <15s)
+        - SC-010 (90% cache hit rate)
+
+        **Workflow**:
+        1. Check if cached translation exists for (chapter_id, target_lang)
+        2. If cached: Return immediately (SC-004: <2s)
+        3. If not cached: Call OpenAI API to translate, cache result, return
+        4. If OpenAI fails: Return error with English content still accessible (FR-026)
+
+        **Technical Details**:
+        - Preserves English technical terms (e.g., "actuator", "kinematics")
+        - Maintains all formulas, equations, and numerical values
+        - Uses formal/academic Urdu appropriate for technical content
+      operationId: translateChapter
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranslationRequest'
+            examples:
+              chapterTranslation:
+                summary: Translate chapter 3 to Urdu
+                value:
+                  chapter_id: 3
+                  target_lang: ur
+      responses:
+        '200':
+          description: Translation delivered successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationResponse'
+              examples:
+                cached:
+                  summary: Cached translation (fast retrieval)
+                  value:
+                    chapter_id: 3
+                    chapter_title: "Actuation Systems"
+                    language_code: ur
+                    original_text: "Hydraulic actuators provide high force density..."
+                    translated_text: "ہائیڈرولک actuators اعلیٰ قوت کی کثافت فراہم کرتے ہیں..."
+                    cached: true
+                    processing_time_ms: 120
+                fresh:
+                  summary: Newly generated translation
+                  value:
+                    chapter_id: 3
+                    chapter_title: "Actuation Systems"
+                    language_code: ur
+                    original_text: "Hydraulic actuators provide high force density..."
+                    translated_text: "ہائیڈرولک actuators اعلیٰ قوت کی کثافت فراہم کرتے ہیں..."
+                    cached: false
+                    processing_time_ms: 12500
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                unsupportedLanguage:
+                  summary: Language not supported
+                  value:
+                    error: validation_error
+                    message: "target_lang must be 'ur' (Urdu). Other languages not yet supported."
+                    details: { field: target_lang, provided: fr, supported: [ur] }
+                invalidChapter:
+                  summary: Chapter not found
+                  value:
+                    error: not_found
+                    message: Chapter with id 99 does not exist
+                    details: { chapter_id: 99 }
+        '500':
+          description: Translation failed (OpenAI API error)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationErrorResponse'
+              example:
+                error: translation_failed
+                message: Translation unavailable, please try again later
+                english_content: "Original English chapter content here..."
+                details:
+                  reason: openai_api_error
+                  error_code: rate_limit_exceeded
+
+  /translate/status:
+    get:
+      tags:
+        - Translation
+      summary: Check translation cache status
+      description: |
+        Get statistics on cached translations for monitoring and pre-generation validation.
+
+        **Use Case**: Verify all 8 chapters are pre-translated before hackathon demo
+      operationId: getTranslationStatus
+      responses:
+        '200':
+          description: Cache statistics retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranslationCacheStatusResponse'
+
+components:
+  schemas:
+    TranslationRequest:
+      type: object
+      required:
+        - chapter_id
+        - target_lang
+      properties:
+        chapter_id:
+          type: integer
+          description: ID of the chapter to translate (must exist in chapters table)
+          minimum: 1
+          maximum: 8
+          example: 3
+        target_lang:
+          type: string
+          description: Target language code (ISO 639-1 format). Currently only 'ur' (Urdu) is supported.
+          enum: [ur]
+          default: ur
+          example: ur
+
+    TranslationResponse:
+      type: object
+      required:
+        - chapter_id
+        - chapter_title
+        - language_code
+        - original_text
+        - translated_text
+        - cached
+      properties:
+        chapter_id:
+          type: integer
+          description: Chapter identifier
+          example: 3
+        chapter_title:
+          type: string
+          description: Chapter title (English)
+          example: "Actuation Systems"
+        language_code:
+          type: string
+          description: Target language code (ISO 639-1)
+          example: ur
+        original_text:
+          type: string
+          description: Original English chapter content
+          example: "Hydraulic actuators provide high force density and are commonly used in industrial robotics applications where high torque is required..."
+        translated_text:
+          type: string
+          description: Urdu translation with preserved technical terms
+          example: "ہائیڈرولک actuators اعلیٰ قوت کی کثافت فراہم کرتے ہیں اور صنعتی robotics applications میں عام طور پر استعمال ہوتے ہیں جہاں زیادہ torque کی ضرورت ہوتی ہے..."
+        cached:
+          type: boolean
+          description: Whether this translation was retrieved from cache (true) or freshly generated (false)
+          example: true
+        cached_at:
+          type: string
+          format: date-time
+          description: Timestamp when translation was cached (UTC)
+          example: "2025-12-14T10:00:00Z"
+        processing_time_ms:
+          type: integer
+          description: Processing time in milliseconds (includes OpenAI API call if not cached)
+          example: 120
+
+    TranslationErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+        - english_content
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: translation_failed
+        message:
+          type: string
+          description: Human-readable error message
+          example: Translation unavailable, please try again later
+        english_content:
+          type: string
+          description: Original English content (graceful degradation per FR-026)
+          example: "Hydraulic actuators provide high force density..."
+        details:
+          type: object
+          properties:
+            reason:
+              type: string
+              description: Underlying failure reason
+              example: openai_api_error
+            error_code:
+              type: string
+              description: OpenAI API error code (if applicable)
+              example: rate_limit_exceeded
+            retry_after:
+              type: integer
+              description: Seconds to wait before retrying (if rate-limited)
+              example: 60
+          additionalProperties: true
+
+    TranslationCacheStatusResponse:
+      type: object
+      properties:
+        total_chapters:
+          type: integer
+          description: Total number of chapters in the book
+          example: 8
+        supported_languages:
+          type: array
+          description: List of supported target languages
+          items:
+            type: string
+          example: [ur]
+        cached_translations:
+          type: object
+          description: Cache status by language
+          properties:
+            ur:
+              type: object
+              properties:
+                cached_count:
+                  type: integer
+                  description: Number of chapters with cached Urdu translations
+                  example: 8
+                cache_coverage_percent:
+                  type: number
+                  format: float
+                  description: Percentage of chapters cached (cached_count / total_chapters × 100)
+                  example: 100.0
+        breakdown:
+          type: array
+          description: Per-chapter translation cache status
+          items:
+            type: object
+            properties:
+              chapter_id:
+                type: integer
+                example: 3
+              chapter_title:
+                type: string
+                example: "Actuation Systems"
+              urdu_cached:
+                type: boolean
+                description: Whether Urdu translation is cached
+                example: true
+              cached_at:
+                type: string
+                format: date-time
+                description: When translation was cached (null if not cached)
+                example: "2025-12-14T10:00:00Z"
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: validation_error
+        message:
+          type: string
+          description: Human-readable error message
+          example: Invalid language code
+        details:
+          type: object
+          additionalProperties: true
+          description: Additional error context
+        request_id:
+          type: string
+          format: uuid
+          description: Unique request identifier for debugging

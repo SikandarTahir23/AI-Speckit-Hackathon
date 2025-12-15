@@ -1,0 +1,340 @@
+/**
+ * AuthWidget Styles - Robotics Theme
+ * Dark tech futuristic design with electric blue accents
+ */
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 20, 25, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  overflow-y: auto;
+  animation: fadeIn 0.2s ease;
+  /* Prevent background scroll */
+  overscroll-behavior: contain;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: linear-gradient(135deg, #1a1f2e 0%, #252d3d 100%);
+  border: 2px solid rgba(0, 212, 255, 0.3);
+  border-radius: 12px;
+  padding: 2.5rem;
+  width: 90%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.5),
+    0 0 40px rgba(0, 212, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.closeButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #8b92a3;
+  line-height: 1;
+  padding: 0.25rem;
+  width: 2rem;
+  height: 2rem;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: #ef4444;
+  color: #ef4444;
+  transform: rotate(90deg);
+}
+
+.modal h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #00d4ff;
+  text-align: center;
+  text-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+  letter-spacing: 0.5px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #c0c7d4;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.75rem;
+}
+
+.field input,
+.field select {
+  padding: 0.875rem 1rem;
+  background: rgba(37, 45, 61, 0.8);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 6px;
+  font-size: 1rem;
+  color: #e5e8ed;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.field input::placeholder {
+  color: #8b92a3;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: #00d4ff;
+  background: rgba(37, 45, 61, 1);
+  box-shadow:
+    0 0 0 3px rgba(0, 212, 255, 0.1),
+    0 0 20px rgba(0, 212, 255, 0.2);
+}
+
+.field select {
+  cursor: pointer;
+}
+
+.profileHeader {
+  margin: 1.5rem 0 1rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(0, 212, 255, 0.2);
+  color: #00ffea;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.85rem;
+}
+
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  padding: 0.75rem 0;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.checkboxGroup label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  font-weight: normal;
+  color: #c0c7d4;
+  transition: color 0.2s ease;
+  padding: 0.5rem;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.checkboxGroup label:hover {
+  color: #00d4ff;
+  background: rgba(0, 212, 255, 0.05);
+}
+
+.checkboxGroup input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  cursor: pointer;
+  accent-color: #00d4ff;
+}
+
+.submitButton {
+  background: linear-gradient(135deg, #00d4ff 0%, #0ea5e9 100%);
+  color: #0f1419;
+  border: none;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+  box-shadow:
+    0 4px 20px rgba(0, 212, 255, 0.3),
+    0 0 40px rgba(0, 212, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.submitButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s ease;
+}
+
+.submitButton:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.submitButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow:
+    0 6px 30px rgba(0, 212, 255, 0.4),
+    0 0 60px rgba(0, 212, 255, 0.3);
+}
+
+.submitButton:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.toggleMode {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  color: #8b92a3;
+}
+
+.toggleMode button {
+  background: none;
+  border: none;
+  color: #00d4ff;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  font-size: inherit;
+  transition: color 0.2s ease;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.toggleMode button:hover {
+  color: #00ffea;
+  border-bottom-color: #00ffea;
+}
+
+/* Validation error styling - Robotics theme */
+.error {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  border-left: 4px solid #ef4444;
+  color: #fca5a5;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.error::before {
+  content: '⚠';
+  font-size: 1.5rem;
+  color: #ef4444;
+}
+
+.field input:invalid:not(:placeholder-shown) {
+  border-color: rgba(239, 68, 68, 0.5);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+/* Scrollbar styling */
+.modal::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.modal::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.3);
+  border-radius: 4px;
+}
+
+.modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 255, 0.5);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 600px) {
+  .modal {
+    width: 95%;
+    padding: 2rem 1.5rem;
+    border-radius: 8px;
+  }
+
+  .modal h2 {
+    font-size: 1.5rem;
+  }
+
+  .field input,
+  .field select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 0.75rem;
+  }
+
+  .submitButton {
+    padding: 0.875rem;
+  }
+}

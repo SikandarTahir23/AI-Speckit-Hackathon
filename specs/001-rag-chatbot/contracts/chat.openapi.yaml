@@ -1,0 +1,315 @@
+openapi: 3.0.3
+info:
+  title: RAG Chatbot API - Chat Endpoints
+  description: |
+    Chat endpoints for the RAG Chatbot system. Enables users to ask questions
+    about "Physical AI & Humanoid Robotics Essentials" and receive grounded,
+    citation-backed answers.
+  version: 1.0.0
+  contact:
+    name: RAG Chatbot Team
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+  - url: https://api.rag-chatbot.example.com
+    description: Production server
+
+paths:
+  /chat:
+    post:
+      summary: Submit a question to the chatbot
+      description: |
+        Main chatbot endpoint. Processes user questions through the RAG pipeline:
+        1. Embed query using text-embedding-3-small
+        2. Retrieve top-k relevant chunks from Qdrant
+        3. Rerank and select top-n chunks
+        4. Generate grounded answer with citations using OpenAI Agent
+        5. Store Q&A in chat history
+
+        **Rate Limit**: 20 requests/minute per IP address
+        **Performance Target**: p95 < 2 seconds
+      operationId: submitChatQuery
+      tags:
+        - Chat
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+            examples:
+              newSession:
+                summary: New conversation (no session_id)
+                value:
+                  query: "What are hydraulic actuators used for in robotics?"
+                  chapter_filter: null
+              existingSession:
+                summary: Follow-up question in existing session
+                value:
+                  session_id: "550e8400-e29b-41d4-a716-446655440000"
+                  query: "What about electric actuators?"
+                  chapter_filter: null
+              chapterFiltered:
+                summary: Question filtered to specific chapter
+                value:
+                  session_id: "550e8400-e29b-41d4-a716-446655440000"
+                  query: "Explain the control systems"
+                  chapter_filter: 5
+      responses:
+        '200':
+          description: Successful query processing
+          headers:
+            X-RateLimit-Limit:
+              description: Total requests allowed per minute
+              schema:
+                type: integer
+                example: 20
+            X-RateLimit-Remaining:
+              description: Requests remaining in current window
+              schema:
+                type: integer
+                example: 15
+            X-RateLimit-Reset:
+              description: Unix timestamp when rate limit resets
+              schema:
+                type: integer
+                example: 1702468800
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+              examples:
+                successWithCitations:
+                  summary: Answer with citations
+                  value:
+                    answer: "Hydraulic actuators are used in robotics for applications requiring high force density, such as heavy-duty manipulation and legged locomotion. They provide superior power-to-weight ratios compared to electric motors in large-scale systems."
+                    citations:
+                      - chapter: "Chapter 3: Actuation Systems"
+                        section: "3.2 Hydraulic Actuators"
+                        paragraph: 5
+                      - chapter: "Chapter 3: Actuation Systems"
+                        section: "3.2 Hydraulic Actuators"
+                        paragraph: 7
+                    query_id: "660e8400-e29b-41d4-a716-446655440000"
+                    session_id: "550e8400-e29b-41d4-a716-446655440000"
+                    processing_time_ms: 1850
+                noMatch:
+                  summary: Query outside knowledge base scope
+                  value:
+                    answer: "I cannot answer this from the book content. This information is not covered in 'Physical AI & Humanoid Robotics Essentials'."
+                    citations: []
+                    query_id: "670e8400-e29b-41d4-a716-446655440000"
+                    session_id: "550e8400-e29b-41d4-a716-446655440000"
+                    processing_time_ms: 450
+        '400':
+          description: Invalid request (validation error)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                emptyQuery:
+                  summary: Empty query
+                  value:
+                    error: "validation_error"
+                    message: "Query cannot be empty or whitespace-only"
+                    details:
+                      field: "query"
+                      constraint: "min_length"
+                    request_id: "req_123456"
+                queryTooLong:
+                  summary: Query exceeds max length
+                  value:
+                    error: "validation_error"
+                    message: "Query too long (2150 chars). Maximum is 2000 characters."
+                    details:
+                      field: "query"
+                      constraint: "max_length"
+                      current_length: 2150
+                    request_id: "req_123457"
+        '404':
+          description: Session not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "not_found"
+                message: "Session ID '550e8400-invalid' not found"
+                details:
+                  resource: "session"
+                request_id: "req_123458"
+        '429':
+          description: Rate limit exceeded
+          headers:
+            X-RateLimit-Limit:
+              schema:
+                type: integer
+                example: 20
+            X-RateLimit-Remaining:
+              schema:
+                type: integer
+                example: 0
+            X-RateLimit-Reset:
+              schema:
+                type: integer
+                example: 1702468860
+            Retry-After:
+              description: Seconds until rate limit resets
+              schema:
+                type: integer
+                example: 45
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "rate_limit_exceeded"
+                message: "Too many requests. Maximum 20 requests per minute."
+                details:
+                  retry_after: 45
+                request_id: "req_123459"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error: "internal_error"
+                message: "An unexpected error occurred while processing your request"
+                details:
+                  error_type: "QdrantConnectionError"
+                request_id: "req_123460"
+
+components:
+  schemas:
+    ChatRequest:
+      type: object
+      required:
+        - query
+      properties:
+        session_id:
+          type: string
+          format: uuid
+          description: |
+            Optional session ID for continuing a conversation. If omitted,
+            a new session is created. Must be a valid UUID v4.
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        query:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          description: |
+            User's question about the book. Maximum 2000 characters.
+            Empty or whitespace-only queries are rejected.
+          example: "What are hydraulic actuators used for in robotics?"
+        chapter_filter:
+          type: integer
+          minimum: 1
+          nullable: true
+          description: |
+            Optional chapter number to filter retrieval. Only search within
+            the specified chapter. Useful for focused questions.
+          example: 3
+
+    ChatResponse:
+      type: object
+      required:
+        - answer
+        - citations
+        - query_id
+        - session_id
+      properties:
+        answer:
+          type: string
+          description: |
+            Chatbot's answer, grounded in book content. If no relevant
+            information found, returns fallback message.
+          example: "Hydraulic actuators are used in robotics for applications requiring high force density..."
+        citations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Citation'
+          description: |
+            List of citations referencing source material. Empty if no
+            relevant content found (fallback response).
+        query_id:
+          type: string
+          format: uuid
+          description: Unique identifier for this Q&A exchange
+          example: "660e8400-e29b-41d4-a716-446655440000"
+        session_id:
+          type: string
+          format: uuid
+          description: Session ID (created if not provided in request)
+          example: "550e8400-e29b-41d4-a716-446655440000"
+        processing_time_ms:
+          type: integer
+          description: Query processing time in milliseconds (for monitoring)
+          example: 1850
+
+    Citation:
+      type: object
+      required:
+        - chapter
+      properties:
+        chapter:
+          type: string
+          description: Chapter reference (e.g., "Chapter 3: Actuation Systems")
+          example: "Chapter 3: Actuation Systems"
+        section:
+          type: string
+          nullable: true
+          description: Optional section reference (e.g., "3.2 Hydraulic Actuators")
+          example: "3.2 Hydraulic Actuators"
+        paragraph:
+          type: integer
+          nullable: true
+          description: Optional paragraph index within chapter
+          example: 5
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+        - request_id
+      properties:
+        error:
+          type: string
+          description: Error code for programmatic handling
+          enum:
+            - validation_error
+            - not_found
+            - rate_limit_exceeded
+            - internal_error
+            - service_unavailable
+          example: "validation_error"
+        message:
+          type: string
+          description: Human-readable error message
+          example: "Query cannot be empty or whitespace-only"
+        details:
+          type: object
+          description: Additional context about the error
+          additionalProperties: true
+          example:
+            field: "query"
+            constraint: "min_length"
+        request_id:
+          type: string
+          description: Unique request identifier for debugging
+          example: "req_123456"
+
+  securitySchemes:
+    # Future: Add API key or JWT authentication
+    # apiKey:
+    #   type: apiKey
+    #   in: header
+    #   name: X-API-Key
+
+tags:
+  - name: Chat
+    description: Core chatbot query endpoints

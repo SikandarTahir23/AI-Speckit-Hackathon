@@ -1,0 +1,106 @@
+/**
+ * DocItem Wrapper - Automatically injects components into doc pages
+ * CRITICAL: Buttons render at TOP of chapter, immediately after login
+ */
+
+import React from 'react';
+import DocItem from '@theme-original/DocItem';
+import { useDoc } from '@docusaurus/plugin-content-docs/client';
+import { useAuth } from '@site/src/contexts/AuthContext';
+import ChapterPersonalization from '@site/src/components/ChapterPersonalization';
+import TranslatedChapter from '@site/src/components/TranslatedChapter';
+
+// Debug: Verify wrapper is loaded
+console.log('🔧 [DocItem Wrapper] Module loaded!');
+
+/**
+ * Extract chapter ID from title (e.g., "Chapter 1: Introduction" -> 1)
+ */
+function extractChapterIdFromTitle(title: string): number | null {
+  const match = title.match(/Chapter\s+(\d+)/i);
+  return match ? parseInt(match[1], 10) : null;
+}
+
+export default function DocItemWrapper(props) {
+  // Safely try to get doc metadata
+  let metadata;
+  try {
+    const doc = useDoc();
+    metadata = doc?.metadata;
+  } catch (error) {
+    console.warn('⚠️ [DocItem] Not in doc context');
+    return <DocItem {...props} />;
+  }
+
+  // Get auth state
+  const { user, loading: authLoading } = useAuth();
+
+  // Get chapter ID from frontMatter or title
+  const chapterId =
+    metadata?.frontMatter?.chapterId ||
+    extractChapterIdFromTitle(metadata?.title || '');
+
+  // Debug logging
+  console.log('📖 [DocItem] Rendering:', {
+    chapterId,
+    hasChapterId: !!chapterId,
+    authLoading,
+    isAuthenticated: !!user,
+    userEmail: user?.email || 'none'
+  });
+
+  // If no chapter ID, render without features
+  if (!chapterId) {
+    console.log('⚠️ [DocItem] No chapter ID found, skipping features');
+    return <DocItem {...props} />;
+  }
+
+  return (
+    <>
+      {/* CRITICAL: Feature buttons at TOP (before content) */}
+      <div style={{
+        marginTop: '1rem',
+        marginBottom: '2rem',
+        padding: '1rem',
+        background: 'rgba(26, 31, 46, 0.3)',
+        borderRadius: '12px'
+      }}>
+        <div style={{
+          fontSize: '0.9rem',
+          color: '#00d4ff',
+          marginBottom: '1rem',
+          fontWeight: 600
+        }}>
+          📚 Chapter {chapterId} Features
+        </div>
+
+        {/* Translation Button - ALWAYS visible */}
+        <TranslatedChapter chapterId={chapterId} />
+
+        {/* Personalization Button - Show immediately when auth ready */}
+        {authLoading ? (
+          <div style={{
+            padding: '1.5rem',
+            textAlign: 'center',
+            color: '#c0c7d4',
+            background: 'rgba(37, 45, 61, 0.5)',
+            border: '2px solid rgba(0, 212, 255, 0.2)',
+            borderRadius: '8px',
+            marginTop: '1rem',
+            fontSize: '0.95rem'
+          }}>
+            ⏳ Loading authentication...
+          </div>
+        ) : (
+          <ChapterPersonalization
+            chapterId={chapterId}
+            isAuthenticated={!!user}
+          />
+        )}
+      </div>
+
+      {/* Original doc content AFTER buttons */}
+      <DocItem {...props} />
+    </>
+  );
+}
