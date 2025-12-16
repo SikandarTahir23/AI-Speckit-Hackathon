@@ -3,7 +3,7 @@
  * Modern, futuristic design for Physical AI & Humanoid Robotics platform
  */
 
-import React from 'react';
+import React, { JSX } from 'react';
 import styles from './styles.module.css';
 
 export default function Footer(): JSX.Element {
