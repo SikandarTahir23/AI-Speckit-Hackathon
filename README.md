@@ -151,18 +151,20 @@ cd Physical-AI-Humanoid-Robotics-Essentials
 
 Create a .env file in the backend root directory:
 
-# OpenAI
+**OpenAI**
 OPENAI_API_KEY=your_openai_api_key
 
-# Qdrant
+**Qdrant**
 QDRANT_URL=https://your-qdrant-cluster-url
+
 QDRANT_API_KEY=your_qdrant_api_key
+
 QDRANT_COLLECTION_NAME=robotics_book_collection
 
-# Database (Neon)
+**Database (Neon)**
 DATABASE_URL=postgresql+psycopg://username:password@host/dbname
 
-# Authentication
+**Authentication**
 BETTER_AUTH_SECRET=your_secret_key
 
 ## ▶️ Running the Backend
@@ -170,11 +172,11 @@ pip install -r requirements.txt
 uvicorn src.main:app --reload
 
 
-# Backend will run at:
+**Backend will run at:**
 http://localhost:8000
 
 
-# API Documentation:
+**API Documentation:**
 http://localhost:8000/docs
 
 ## ▶️ Running the Frontend
@@ -184,5 +186,5 @@ Or
 npm install
 npm start
 
-# Frontend will run at:
+**Frontend will run at:**
 http://localhost:3000
