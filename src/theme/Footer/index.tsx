@@ -27,7 +27,7 @@ export default function Footer(): JSX.Element {
           {/* Right Side: Social Media Icons */}
           <div className={styles.footerSocial}>
             <a
-              href="https://github.com/your-repo"
+              href="https://github.com/SikandarTahir23/AI-Speckit-Hackathon"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.socialLink}
@@ -47,7 +47,7 @@ export default function Footer(): JSX.Element {
             </a>
 
             <a
-              href="https://linkedin.com/company/your-company"
+              href="https://www.linkedin.com/in/sikandar-tahir-356a56273/"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.socialLink}
@@ -69,7 +69,7 @@ export default function Footer(): JSX.Element {
             </a>
 
             <a
-              href="https://facebook.com/your-page"
+              href="https://www.facebook.com/Arain.Boyz380"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.socialLink}
