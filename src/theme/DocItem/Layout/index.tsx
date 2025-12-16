@@ -1,17 +1,18 @@
 /**
- * DocItem/Layout Wrapper - Injects chapter features at the TOP
- * This is the correct component to wrap for adding content to doc pages
+ * DocItem/Layout Wrapper - Adds ChapterHeader to chapter pages
+ * Displays language toggle and personalization controls in header area
+ * Shows translated/personalized content when active
  */
 
 import React from 'react';
 import Layout from '@theme-original/DocItem/Layout';
 import { useDoc } from '@docusaurus/plugin-content-docs/client';
-import { useAuth } from '@site/src/contexts/AuthContext';
-import ChapterPersonalization from '@site/src/components/ChapterPersonalization';
-import TranslatedChapter from '@site/src/components/TranslatedChapter';
+import { ChapterContentProvider } from '@site/src/contexts/ChapterContentContext';
+import ChapterHeader from '@site/src/components/ChapterHeader';
+import ChapterContentDisplay from '@site/src/components/ChapterContentDisplay';
 import type {Props} from '@theme/DocItem/Layout';
 
-console.log('🔧 [DocItem/Layout] Module loaded!');
+console.log('🔧 [DocItem/Layout] Module loaded with ChapterHeader & ContentDisplay!');
 
 /**
  * Extract chapter ID from title (e.g., "Chapter 1: Introduction" -> 1)
@@ -22,11 +23,8 @@ function extractChapterIdFromTitle(title: string): number | null {
 }
 
 export default function LayoutWrapper(props: Props) {
-  // Get doc metadata - should work at Layout level
+  // Get doc metadata
   const { metadata } = useDoc();
-
-  // Get auth state
-  const { user, loading: authLoading } = useAuth();
 
   // Get chapter ID from frontMatter or title
   const chapterId =
@@ -38,69 +36,32 @@ export default function LayoutWrapper(props: Props) {
     title: metadata?.title,
     chapterId,
     hasChapterId: !!chapterId,
-    authLoading,
-    isAuthenticated: !!user,
-    userEmail: user?.email || 'none'
   });
 
-  // If no chapter ID, render without features
+  // If no chapter ID, render without header controls
   if (!chapterId) {
-    console.log('⚠️ [DocItem/Layout] No chapter ID found, skipping features');
+    console.log('⚠️ [DocItem/Layout] No chapter ID found, skipping ChapterHeader');
     return <Layout {...props} />;
   }
 
   return (
-    <>
-      {/* CRITICAL: Feature buttons at TOP (before content) */}
+    <ChapterContentProvider>
+      {/* ChapterHeader - positioned in top right of page */}
       <div style={{
-        marginTop: '1rem',
-        marginBottom: '2rem',
-        padding: '1.5rem',
-        background: 'linear-gradient(135deg, rgba(26, 31, 46, 0.5) 0%, rgba(37, 45, 61, 0.5) 100%)',
-        border: '2px solid rgba(0, 212, 255, 0.3)',
-        borderRadius: '12px',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.2)'
+        display: 'flex',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        marginBottom: '1.5rem',
+        paddingTop: '0.5rem',
       }}>
-        <div style={{
-          fontSize: '1rem',
-          color: '#00d4ff',
-          marginBottom: '1.5rem',
-          fontWeight: 700,
-          textTransform: 'uppercase',
-          letterSpacing: '1px',
-          textShadow: '0 0 10px rgba(0, 212, 255, 0.5)'
-        }}>
-          📚 Chapter {chapterId} Features
-        </div>
-
-        {/* Translation Button - ALWAYS visible */}
-        <div style={{ marginBottom: '1rem' }}>
-          <TranslatedChapter chapterId={chapterId} />
-        </div>
-
-        {/* Personalization Button - Show immediately when auth ready */}
-        {authLoading ? (
-          <div style={{
-            padding: '1.5rem',
-            textAlign: 'center',
-            color: '#c0c7d4',
-            background: 'rgba(37, 45, 61, 0.5)',
-            border: '2px solid rgba(0, 212, 255, 0.2)',
-            borderRadius: '8px',
-            fontSize: '0.95rem'
-          }}>
-            ⏳ Loading authentication...
-          </div>
-        ) : (
-          <ChapterPersonalization
-            chapterId={chapterId}
-            isAuthenticated={!!user}
-          />
-        )}
+        <ChapterHeader chapterId={chapterId} />
       </div>
 
-      {/* Original doc layout (content comes after buttons) */}
+      {/* Original doc layout (breadcrumb, title, content) */}
       <Layout {...props} />
-    </>
+
+      {/* ChapterContentDisplay - shows translated/personalized content when active */}
+      <ChapterContentDisplay />
+    </ChapterContentProvider>
   );
 }

@@ -86,7 +86,9 @@ export default function ChapterControls({
       <div className={styles.header}>
         <h4>Personalize Content</h4>
         <p className={styles.subtitle}>
-          Adapt this chapter to your experience level
+          
+          
+          
         </p>
       </div>
 

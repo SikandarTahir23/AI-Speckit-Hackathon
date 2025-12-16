@@ -17,15 +17,17 @@ logger = setup_logger(__name__)
 # Urdu translation prompt with technical term preservation rules
 URDU_TRANSLATION_PROMPT = """You are an expert technical translator specializing in English to Urdu translation for robotics and AI content.
 
-TASK: Translate the following English text to Urdu.
+TASK: Translate the following English text to Urdu using URDU SCRIPT (اردو رسم الخط). You MUST write the output in Urdu/Arabic script, NOT in English or romanized text.
 
 CRITICAL RULES (PREVENT MISTRANSLATION):
-1. PRESERVE TECHNICAL TERMS: Keep English technical terms unchanged (e.g., "actuator", "kinematics", "sensor", "robot", "AI", "algorithm")
-2. ACCURACY: Provide accurate, natural Urdu translation
-3. NO ADDITIONS: Do not add explanations or content not in the original
-4. FORMATTING: Preserve markdown formatting (headers, lists, code blocks)
-5. READABILITY: Use clear, formal Urdu suitable for technical documentation
-6. NUMBERS: Keep all numbers and measurements in English format
+1. OUTPUT IN URDU SCRIPT: Write your entire translation in Urdu script (اردو). Do NOT use Latin/English characters except for preserved technical terms.
+2. PRESERVE TECHNICAL TERMS: Keep English technical terms unchanged (e.g., "actuator", "kinematics", "sensor", "robot", "AI", "algorithm")
+3. ACCURACY: Provide accurate, natural Urdu translation
+4. NO ADDITIONS: Do not add explanations or content not in the original
+5. FORMATTING: Preserve markdown formatting (headers, lists, code blocks)
+6. READABILITY: Use clear, formal Urdu suitable for technical documentation
+7. NUMBERS: Keep all numbers and measurements in English format
+8. RIGHT-TO-LEFT: Remember Urdu is written right-to-left
 
 TECHNICAL TERMS TO PRESERVE (keep in English):
 - Robot, robotics, humanoid, physical AI
@@ -38,16 +40,20 @@ TECHNICAL TERMS TO PRESERVE (keep in English):
 - Any programming terms or code snippets
 
 TRANSLATION STRATEGY:
-- Translate descriptive text and explanations to Urdu
+- Translate descriptive text and explanations to Urdu IN URDU SCRIPT (اردو رسم الخط)
 - Keep technical vocabulary in English
 - Maintain paragraph structure
 - Preserve all markdown syntax
 - Use formal/academic Urdu style
+- Write right-to-left as Urdu is read
+
+Example of correct output format:
+"Physical AI ایک ایسا نظام ہے جو مشینوں کو حقیقی دنیا میں intelligent طریقے سے کام کرنے کی اجازت دیتا ہے۔"
 
 Original English content:
 {content}
 
-Provide the Urdu translation:"""
+Provide the Urdu translation (MUST be in Urdu script اردو):"""
 
 
 class TranslationAgent:
@@ -66,9 +72,9 @@ class TranslationAgent:
             raise ValueError("GEMINI_API_KEY not found in environment or settings")
 
         genai.configure(api_key=gemini_api_key)
-        self.model = genai.GenerativeModel('gemini-1.5-flash')  # Fast and efficient
+        self.model = genai.GenerativeModel('gemini-flash-latest')  # Gemini Flash Latest (better free tier quota)
 
-        logger.info(f"TranslationAgent initialized with Gemini Flash")
+        logger.info(f"TranslationAgent initialized with Gemini Flash Latest")
 
     async def translate_to_urdu(
         self,
