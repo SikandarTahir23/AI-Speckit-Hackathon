@@ -20,7 +20,7 @@ export default function Footer(): JSX.Element {
               Physical AI & Humanoid Robotics
             </h3>
             <p className={styles.footerTagline}>
-              An interactive learning platform for Physical AI and Robotics
+              An interactive learning platform for Physical AI and Robotics.
             </p>
           </div>
 
@@ -68,7 +68,7 @@ export default function Footer(): JSX.Element {
               </svg>
             </a>
 
-            <a
+            {/* <a
               href="https://www.facebook.com/Arain.Boyz380"
               target="_blank"
               rel="noopener noreferrer"
@@ -86,7 +86,7 @@ export default function Footer(): JSX.Element {
               >
                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
               </svg>
-            </a>
+            </a> */}
           </div>
         </div>
 
