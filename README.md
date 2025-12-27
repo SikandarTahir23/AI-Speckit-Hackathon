@@ -2,7 +2,7 @@
 ### An Interactive Robotics Learning Platform with RAG Chatbot
 
 This project is a complete **educational platform** built around the book  
-**“Physical AI & Humanoid Robotics — Essentials”**.
+**“Physical AI & Humanoid Robotics — Essentials”.**
 
 It combines a **modern documentation website**, an **AI-powered RAG chatbot**,  
 **personalized learning**, **content translation**, and **secure authentication**  
